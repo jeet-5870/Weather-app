@@ -17,28 +17,51 @@
       <h6 id="weather"></h6>
       <h4><span id="temp"></span><sup>o</sup>C</h4>
       <img src="" id="icon" alt="">
-      <button onclick="window.location.reload()" class="refresh"><i class="fa fa-refresh"></i></button>
+      <button id="refresh" class="refresh"><i class="fa fa-refresh"></i></button>
     </div>
   </div>
   <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity=""></script>
+
   <script>
-    link = "https://api.openweathermap.org/data/2.5/weather?q=delhi&appid=5b9fba92b47a5c1ffec5f2528b87635a";
-    var request = new XMLHttpRequest();
-    request.open('GET', link,true);
-    request.onload = function(){
-      var obj = JSON.parse(this.response);
-      console.log(obj);
-      document.getElementById('weather').innerHTML = obj.weather[0].description;
-      document.getElementById('location').innerHTML = obj.name;
-      document.getElementById('temp').innerHTML = Math.round(obj.main.temp - 273.15);
-      document.getElementById('icon').src = "https://openweathermap.org/img/w/" + obj.weather[0].icon + ".png";
-    }
-    if(request.status>=200 && request.status<400){
-      var temp = obj.main.temp;
-    }else{
-      console.log("City data is not available");
-    }
+  function fetchWeather() {
+    const link = "https://api.openweathermap.org/data/2.5/weather?q=delhi&appid=5b9fba92b47a5c1ffec5f2528b87635a";
+    const request = new XMLHttpRequest();
+
+    request.onload = function () {
+      if (request.status >= 200 && request.status < 400) {
+        const obj = JSON.parse(request.responseText);
+        console.log("Page loaded");
+        document.getElementById('weather').textContent = obj.weather[0].description;
+        document.getElementById('location').textContent = obj.name;
+        document.getElementById('temp').textContent = Math.round(obj.main.temp - 273.15);
+        document.getElementById('icon').src = "https://openweathermap.org/img/w/" + obj.weather[0].icon + ".png";
+      } else {
+        console.log("City data is not available");
+      }
+    };
+
+    request.onerror = function () {
+      console.error("Request failed");
+    };
+
+    request.open('GET', link, true);
     request.send();
-  </script>
+  }
+
+  // Load weather data on page load
+  window.addEventListener("DOMContentLoaded", fetchWeather);
+
+  // Refresh button handler
+  document.addEventListener("DOMContentLoaded", function () {
+    const refreshBtn = document.getElementById("refresh");
+    if (refreshBtn) {
+      refreshBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        fetchWeather();
+      });
+    }
+  });
+</script>
+
 </body>
 </html>
